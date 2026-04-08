@@ -1,0 +1,24 @@
+from dash import html, dcc
+
+class CatalogBut:
+    def __init__(self, href='/original_catalogs'): # Добавили аргумент для ссылки
+        self.but = dcc.Link(
+            'RailParts',
+            href=href,  # Адрес страницы
+            style={
+                'backgroundColor': '#007bff',
+                'color': 'white',
+                'border': 'none',
+                'padding': '10px 20px',
+                'text-align': 'center',
+                'text-decoration': 'none', # Убираем подчеркивание
+                'display': 'inline-block',
+                'fontSize': '16px',
+                'cursor': 'pointer',
+                'borderRadius': '5px',
+                'margin': '10px'
+            }
+        )
+
+    def __call__(self, *args, **kwargs):
+        return self.but

@@ -1,0 +1,4 @@
+flask
+dash
+sqlalchemy
+sqlalchemy_utils
