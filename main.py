@@ -1,5 +1,3 @@
-from dash import html
-
 import dash
 from app.pages_registration import page_registration
 
@@ -7,7 +5,6 @@ from app.pages_registration import page_registration
 
 
 app = dash.Dash(__name__, use_pages=True, pages_folder='app/pages')
-
 
 
 page_registration()
