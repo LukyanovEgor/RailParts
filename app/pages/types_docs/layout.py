@@ -20,8 +20,7 @@ class Layout:
         )
 
 
-    # def __call__(self, *args, **kwargs):
-    #     return self.layout
+
 
     def __call__(self, *args, **kwargs):
         # ✅ __call__ будет вызван Dash с параметрами маршрута
@@ -32,6 +31,3 @@ class Layout:
             ]),
         ])
 
-# # Фабричная функция для Dash
-# def types_docs_layout(train_type_id=None, **kwargs):
-#     return Layout(train_type_id=train_type_id)()

@@ -125,6 +125,18 @@ def show_catalog(train_type_id):
     prevent_initial_call=True
 )
 def handle_category_click(n_clicks_list, train_type_id):
+    DATA = {
+        "current_image": {
+            "url": "https://your-storage.com/image.png",  # Ссылка на вашу картинку
+            "points": [
+                {"id": 1, "x": 0.25, "y": 0.22, "text": "1"},
+                {"id": 2, "x": 0.55, "y": 0.85, "text": "2"},
+                {"id": 3, "x": 0.05, "y": 0.05, "text": "11"},
+                # Добавьте точки, соответствующие вашей картинке
+            ]
+        }
+    }
+
     if not n_clicks_list or all(click is None for click in n_clicks_list):
         return no_update
 
@@ -136,7 +148,38 @@ def handle_category_click(n_clicks_list, train_type_id):
 
         if url:
             return html.Div(
-                    html.Img(src=f"{url}", style={"width": "1100px", "height": "700px"})
+                    # html.Img(src=f"{url}", style={"width": "1100px", "height": "700px"})
+
+                html.Div(
+                    [
+                        # Сама картинка
+                        html.Img(
+                            src=f"{url}",
+                            style={"width": "100%", "height": "auto", "display": "block"}
+                        ),
+                        # Слой с кнопками (генерируется циклом)
+                        *[
+                            html.Button(
+                                p["text"],
+                                id={"type": "point-btn", "index": p["id"]},
+                                style={
+                                    "position": "absolute",
+                                    "left": f"{p['x'] * 100}%",
+                                    "top": f"{p['y'] * 100}%",
+                                    "transform": "translate(-50%, -50%)",  # Центрируем кнопку по координате
+                                    "background": "yellow",  # Для теста, потом можно прозрачный
+                                    "border": "1px solid black",
+                                    "borderRadius": "50%",
+                                    "width": "24px",
+                                    "height": "24px",
+                                    "cursor": "pointer",
+                                    "zIndex": 10
+                                }
+                            ) for p in DATA["current_image"]["points"]
+                        ]
+                    ],
+                    style={"position": "relative", "width": "800px", "margin": "0 auto"}  # Фикс ширина для примера
+                )
                 )
         return None
     return no_update
