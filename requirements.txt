@@ -2,3 +2,5 @@ flask
 dash
 sqlalchemy
 sqlalchemy_utils
+PyJWT
+werkzeug

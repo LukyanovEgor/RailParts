@@ -1,10 +1,17 @@
-import dash
 from app.pages_registration import page_registration
+from flask import Flask, send_from_directory
+from app.routes.auth import auth_bp
+import dash
+import os
 
 
 
+server = Flask(__name__)
+server.secret_key = os.urandom(24)  # В продакшене используйте фиксированный секрет
 
-app = dash.Dash(__name__, use_pages=True, pages_folder='app/pages')
+server.register_blueprint(auth_bp)
+
+app = dash.Dash(__name__, use_pages=True, server=server, pages_folder='app/pages')
 
 
 page_registration()
@@ -16,8 +23,6 @@ server = app.server
 
 
 #---------------------------------------------
-import os
-from flask import send_from_directory
 IMAGES_DIR = os.path.join(os.getcwd(), 'test_images')
 # Создаём маршрут для раздачи файлов
 @server.route('/test_images/<path:filename>')
