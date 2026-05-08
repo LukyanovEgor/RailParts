@@ -4,4 +4,5 @@ from .types_docs.types_page import types_docs_layout
 
 from .header import Header
 
-from .auth.authorization_page import register_layout
+from .auth.register_page import register_layout
+from .auth.login_page import login_layout

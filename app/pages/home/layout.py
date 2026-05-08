@@ -1,18 +1,20 @@
 from dash import html
-from .components import CatalogBut
+from .components import CatalogBut, AuthBut, AuthBar
 from app.pages.header import Header
 
 
 class Layout:
     def __init__(self):
 
-        self.layout = html.Div(
+        self.layout = html.Div([
+            html.Div(Header()(), className="card-header"),
+            html.Div([
+                CatalogBut()(),
+                AuthBut()(),
+                AuthBar()(),
+            ], className="buttons-row")
+        ])
 
-            [
-                html.Div(Header()(), className="card-header"),
-                html.Div(CatalogBut()(), className="r"),
-            ]
-        )
 
 
     def __call__(self, *args, **kwargs):
