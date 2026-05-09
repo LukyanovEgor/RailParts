@@ -1,54 +1,108 @@
-from dash import dcc, Input, Output, State, callback
+from dash import dcc, Input, Output, State, callback, ctx
 from .layouts.login_layout import Layout
+from .components import PHONE_FORM, EMAIL_FORM
+from app.db import get_db
+from app.models.users import Users
+from werkzeug.security import check_password_hash
+
+
 
 def login_layout():
     return Layout()()
 
 
-
+# переключатель
 @callback(
-    Output("output-msg", "children"),
-    Input("submit-btn", "n_clicks"),
-    State("email_log", "value"),
-    State("phone_log", "value"),
-    State("password_log", "value"),
+    Output('form-store', 'data'),
+    Output('email-type', 'data-state'),
+    Output('phone-type', 'data-state'),
+    Input('email-type', 'n_clicks'),
+    Input('phone-type', 'n_clicks'),
     prevent_initial_call=True
 )
-def login_user(n_clicks, firstname, lastname, patronymic, email, phone, age, password):
-    # Базовая валидация
-    # if not all([firstname, lastname, email, phone, age, password]):
-    #     return "⚠️ Заполните все обязательные поля."
-    # if len(password) < 6:
-    #     return "⚠️ Пароль должен содержать минимум 6 символов."
-    #
-    # if age < 1 or age > 120:
-    #     return "⚠️ Укажите корректный возраст (1-120)."
-    #
-    #     # Сохранение в БД (пример с SQLAlchemy)
-    # from app.db import get_db
-    # from app.models.users import Users
-    # from werkzeug.security import generate_password_hash
-    #
-    # db = get_db()
-    #
-    # # Проверка на существующего пользователя
-    # if db.query(Users).filter(Users.email == email).first():
-    #     db.close()
-    #     return "⚠️ Пользователь с таким email уже существует."
-    #
-    # # Хеширование пароля и создание пользователя
-    # new_user = Users(
-    #     user_password=generate_password_hash(password),
-    #     email=email,
-    #     phone=phone,
-    #     age=int(age),
-    #     firstname=firstname,
-    #     lastname=lastname,
-    #     patronymic=patronymic or ""
-    # )
-    # db.add(new_user)
-    # db.commit()
-    # user_id = new_user.user_id
-    # db.close()
+def switch(n1, n2):
+    triggered = ctx.triggered_id
+    if triggered == 'email-type':
+        return 'email-type', 'active', 'inactive'
+    return 'phone-type', 'inactive', 'active'
 
-    return dcc.Location(id="redirect", href=f"/auth/set-token?user_id={user_id}&email={email}", refresh=True)
+
+#модуль входа
+@callback(
+    Output('form', 'children'),
+    Input('form-store', 'data')
+)
+def render_form(active_tab):
+
+    if active_tab == 'email-type':
+        return EMAIL_FORM
+    return PHONE_FORM
+
+
+@callback(
+    Output("phone_output", "children"),
+    Input("phone_submit", "n_clicks"),
+    State("phone_log", "value"),
+    State("phone_password", "value"),
+    State('form-store', 'data'),  # текущая вкладка: 'phone-type' или 'email-type'
+    prevent_initial_call=True
+)
+def handle_phone_log(phone_clicks, phone, phone_pass, active_tab):
+    db = get_db()
+
+    triggered = ctx.triggered_id
+
+    if triggered == "phone_submit":
+        if not all([phone, phone_pass]):
+            return "⚠️ Заполните все обязательные поля."
+
+        try:
+            user = db.query(Users).filter(Users.email == phone).first()
+
+            if not user:
+                return '⚠️ Пользователь с таким номером телефона не найден'
+
+            if not check_password_hash(user.user_password, phone_pass):
+                return '⚠️ Неверный пароль'
+
+            user_id = user.user_id
+            email = user.email
+
+            return dcc.Location(id="redirect", href=f"/auth/set-token?user_id={user_id}&email={email}", refresh=True)
+
+        except Exception as e:
+            print(e)
+
+
+@callback(
+    Output("email_output", "children"),
+    Input("email_submit", "n_clicks"),
+    State("email_log", "value"),
+    State("email_password", "value"),
+    State('form-store', 'data'),  # текущая вкладка: 'phone-type' или 'email-type'
+    prevent_initial_call=True
+)
+def handle_email_log(email_clicks, email, email_pass, active_tab):
+    db = get_db()
+
+    triggered = ctx.triggered_id
+
+    if triggered == "email_submit":
+        if not all([email, email_pass]):
+            return "⚠️ Заполните все обязательные поля."
+
+        try:
+            user = db.query(Users).filter(Users.email == email).first()
+
+            if not user:
+                return '⚠️ Пользователь с таким email не найден'
+
+
+            if not check_password_hash(user.user_password, email_pass):
+                return '⚠️ Неверный пароль'
+
+            user_id = user.user_id
+            return dcc.Location(id="redirect", href=f"/auth/set-token?user_id={user_id}&email={email}", refresh=True)
+
+        except Exception as e:
+            print(e)

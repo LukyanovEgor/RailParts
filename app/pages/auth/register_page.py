@@ -1,4 +1,7 @@
 from dash import html, dcc, Input, Output, State, callback
+from app.db import get_db
+from app.models.users import Users
+from werkzeug.security import generate_password_hash
 
 
 def register_layout():
@@ -66,11 +69,6 @@ def register_user(n_clicks, firstname, lastname, patronymic, email, phone, age, 
 
     if age < 1 or age > 120:
         return "⚠️ Укажите корректный возраст (1-120)."
-
-        # Сохранение в БД (пример с SQLAlchemy)
-    from app.db import get_db
-    from app.models.users import Users
-    from werkzeug.security import generate_password_hash
 
     db = get_db()
 
