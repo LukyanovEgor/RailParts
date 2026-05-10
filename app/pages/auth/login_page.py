@@ -57,7 +57,7 @@ def handle_phone_log(phone_clicks, phone, phone_pass, active_tab):
             return "⚠️ Заполните все обязательные поля."
 
         try:
-            user = db.query(Users).filter(Users.email == phone).first()
+            user = db.query(Users).filter(Users.phone == phone).first()
 
             if not user:
                 return '⚠️ Пользователь с таким номером телефона не найден'

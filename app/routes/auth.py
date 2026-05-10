@@ -21,8 +21,18 @@ def set_token():
     response.set_cookie(
         "auth_token", token,
         max_age=7 * 24 * 60 * 60,
+        # max_age=60*5,
         httponly=True,
         secure=False,
         samesite="Lax"
     )
+    return response
+
+
+@auth_bp.route('/auth/logout')
+def logout():
+    response = make_response(redirect("/"))
+
+    response.delete_cookie("auth_token", path="/")
+
     return response
