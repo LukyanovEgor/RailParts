@@ -37,17 +37,6 @@ PRODUCTS = [
      "img": "https://placehold.co/150x120/e9ecef/495057?text=Sensor"},
 ]
 
-QUICK_FILTERS = [
-    {"label": "масло", "keywords": ["масло", "oil", "моторное"]},
-    {"label": "zic", "keywords": ["zic"]},
-    {"label": "аккумулятор", "keywords": ["аккумулятор", "battery"]},
-    {"label": "тормозная", "keywords": ["тормоз", "brake", "тормозная", "диск", "колодк"]},
-    {"label": "домкрат", "keywords": ["домкрат"]},
-    {"label": "герметик", "keywords": ["герметик"]},
-    {"label": "медная", "keywords": ["медная", "медь"]},
-    {"label": "предохранитель", "keywords": ["предохранитель"]},
-]
-
 layout = Layout()
 
 def render_cards(items):

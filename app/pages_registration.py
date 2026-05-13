@@ -4,7 +4,8 @@ from app.pages import (home_layout,
                     types_docs_layout,
                     register_layout,
                     login_layout,
-                    parts_layout,)
+                    parts_layout,
+                    admin_layout,)
 
 
 def page_registration():
@@ -18,3 +19,5 @@ def page_registration():
 
     dash.register_page('Auth-register', path='/signup', title='Регистрация', layout=register_layout)
     dash.register_page('Auth-login', path='/signin', title='Вход в аккаунт', layout=login_layout)
+
+    dash.register_page('Admin', path='/admin', title='Вход в аккаунт', layout=admin_layout)
