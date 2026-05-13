@@ -1,12 +1,11 @@
 from dash import html, dcc
 
 
-class CatalogBut:
-    def __init__(self, href='/original_catalogs'): # Добавили аргумент для ссылки
+class PartsBut:
+    def __init__(self, href='/parts'): # Добавили аргумент для ссылки
         self.but = dcc.Link(
-            'Оригинальные каталоги',
-            href=href,  # Адрес страницы
-            refresh=True,
+            'Поиск деталей',
+            href=href,
             style={
                 'backgroundColor': '#007bff',
                 'color': 'white',

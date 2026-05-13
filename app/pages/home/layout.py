@@ -1,5 +1,5 @@
 from dash import html, dcc
-from .components import CatalogBut, AuthBar, ProfileBar
+from .components import CatalogBut, AuthBar, ProfileBar, PartsBut
 from app.pages.header import Header
 
 
@@ -13,6 +13,9 @@ class Layout:
                 html.Div(
                     [
                         CatalogBut()(),
+
+                        PartsBut()(),
+                        
                         html.Div(
                             id='auth-or-profile'
                         ),

@@ -1,5 +1,5 @@
 from app.pages_registration import page_registration
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request, redirect
 from app.routes.auth import auth_bp
 import dash
 import os
@@ -21,6 +21,12 @@ app.layout = dash.page_container
 
 server = app.server
 
+
+@server.before_request
+def protect_catalog_route():
+    if request.method == 'GET' and request.path.startswith('/original_catalogs'):
+        if not request.cookies.get('auth_token'):
+            return redirect('/signin')
 
 #---------------------------------------------
 IMAGES_DIR = os.path.join(os.getcwd(), 'test_images')

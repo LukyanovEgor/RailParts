@@ -22,7 +22,11 @@ def check_jwt_and_render(_):
     # from dash import html
     try:
         # 2. Декодируем токен (замените на ваш SECRET_KEY)
-        payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+        try:
+            payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+        except Exception as e:
+
+            return AuthBut()()
 
         user_id = payload.get("user_id")
 
