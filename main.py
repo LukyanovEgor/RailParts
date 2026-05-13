@@ -23,12 +23,51 @@ server = app.server
 
 
 @server.before_request
-def protect_catalog_route():
-    if request.method == 'GET' and request.path.startswith('/original_catalogs'):
+def protect_routes():
+    # if request.method == 'GET' and request.path.startswith('/original_catalogs'):
+    #     if not request.cookies.get('auth_token'):
+    #         return redirect('/signin')
+
+    import jwt
+    if request.method != 'GET':
+        return
+
+    path = request.path
+
+    if path.startswith('/original_catalogs'):
         if not request.cookies.get('auth_token'):
             return redirect('/signin')
 
-#---------------------------------------------
+        # 2️⃣ Защита админки: проверка user_id внутри JWT
+    if path.startswith('/admin'):
+        token = request.cookies.get('auth_token')
+
+        if not token:
+            return redirect('/signin')  # Токена нет → на вход
+
+        try:
+
+            payload = jwt.decode(
+                token,
+                "your-secret-key",
+                algorithms=['HS256']
+            )
+
+            # Проверяем user_id
+            user_id = payload.get('user_id')
+
+            if int(user_id) != 1:
+                return redirect('/')  # Не админ → на главную
+
+        except jwt.ExpiredSignatureError:
+            # Токен истёк
+            return redirect('/signin')
+        except jwt.InvalidTokenError:
+            # Неверный токен
+
+
+            return redirect('/signin')
+
 IMAGES_DIR = os.path.join(os.getcwd(), 'test_images')
 # Создаём маршрут для раздачи файлов
 @server.route('/test_images/<path:filename>')
@@ -36,11 +75,8 @@ def serve_image(filename):
     return send_from_directory(IMAGES_DIR, filename)
 
 
-app.config.suppress_callback_exceptions = False
-#---------------------------------------------
-
-
 app.config.suppress_callback_exceptions = True
+
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True)

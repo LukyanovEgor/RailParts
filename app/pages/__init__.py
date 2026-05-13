@@ -8,3 +8,5 @@ from .header import Header
 from .auth.register_page import register_layout
 from .auth.login_page import login_layout
 
+from .admin.admin_page import layout as admin_layout
+
