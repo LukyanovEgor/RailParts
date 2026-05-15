@@ -1,4 +1,4 @@
-from sqlalchemy import INTEGER, TEXT, ForeignKey, Column
+from sqlalchemy import INTEGER, TEXT, VARCHAR, ForeignKey, Column
 from sqlalchemy.orm import relationship
 from app.db import Base
 
@@ -9,6 +9,7 @@ class OEMParts(Base):
     id = Column(INTEGER(), primary_key=True, nullable=False, autoincrement=True)
     oem_num = Column(TEXT(), nullable=False, unique=True)
     name = Column(TEXT(), nullable=False)
+    img_url = Column(VARCHAR(255), nullable=True)
     category_id = Column(INTEGER(), ForeignKey('parts_categories.id', ondelete='SET NULL'), nullable=False)
 
     # relationships
