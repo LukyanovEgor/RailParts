@@ -21,3 +21,8 @@ class AnalogueParts(Base):
         foreign_keys=[oem_id]
     )
 
+    order_items = relationship(
+        'OrderItems',
+        back_populates='analogue_part'
+    )
+

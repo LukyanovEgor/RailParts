@@ -24,3 +24,8 @@ class OEMParts(Base):
         'AnalogueParts',
         back_populates='oem_part'
     )
+
+    order_items = relationship(
+        'OrderItems',
+        back_populates='oem_part'
+    )
