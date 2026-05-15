@@ -7,18 +7,22 @@ class Layout:
     def __init__(self):
         self.layout = html.Div(
             [
-                dcc.Store(id='auth-trigger', data='init', storage_type='memory'),
+                dcc.Interval(
+                    id='data-refresh-interval',
+                    interval=30 * 1000,  # 30 секунд
+                    n_intervals=0
+                ),
 
                 html.Div(Header()(), className="card-header"),
                 html.Div(
                     [
-                        # CatalogBut()(),
-                        #
-                        # PartsBut()(),
+                        html.H2('Заказы запчастей со склада'),
+
+                        html.Div(id='order-table'),
 
 
 
-                    ], className="buttons-row"
+                    ]
                 )
             ]
         )
