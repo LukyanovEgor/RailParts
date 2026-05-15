@@ -14,6 +14,8 @@ Base = declarative_base()
 if not database_exists(engine.url):
     create_database(engine.url)
 
+Base.metadata.create_all(engine)
+
 def get_db():
     db = session_maker()
     return db
