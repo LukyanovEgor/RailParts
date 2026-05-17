@@ -11,6 +11,8 @@ class OEMParts(Base):
     name = Column(TEXT(), nullable=False)
     img_url = Column(VARCHAR(255), nullable=True)
     category_id = Column(INTEGER(), ForeignKey('parts_categories.id', ondelete='SET NULL'), nullable=False)
+    img_coordinates = Column(TEXT(), nullable=True)
+
 
     # relationships
 
