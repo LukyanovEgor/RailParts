@@ -18,8 +18,21 @@ def render_cards(items):
             html.Div(
                 children = [
                     html.Img(src=p["img"], className="card-img"),
-                    html.Div(f"{p['code']}  Код товара: {p['article']}", className="meta"),
-                    html.Div(p["name"], className="title")
+                    html.Div(f"{p['code']} {p['article']}", className="meta"),
+                    html.Div(p["name"], className="title"),
+                    html.Button('Заказать', style={
+                            'backgroundColor': '#007bff',
+                            'color': 'white',
+                            'border': 'none',
+                            'padding': '10px 20px',
+                            'text-align': 'center',
+                            'text-decoration': 'none',
+                            'display': 'inline-block',
+                            'fontSize': '16px',
+                            'cursor': 'pointer',
+                            'borderRadius': '5px',
+                            'margin': '10px'
+                        })
                 ], className="card",
                 style={"padding": "40px"}
             )
@@ -37,7 +50,6 @@ def format_for_cards(parts):
                 "article": p.oem_num,
                 "img": p.img_url if p.img_url else "/assets/no_icon_part.png",
                 "id": p.id
-                # добавьте другие поля, если render_cards их требует
             }
         except AttributeError:
 
@@ -47,7 +59,6 @@ def format_for_cards(parts):
                 "article": p.analogue_num,
                  "img": p.img_url if p.img_url else "/assets/no_icon_part.png",
                 "id": p.id
-                # добавьте другие поля, если render_cards их требует
             }
 
         part_list.append(part)
