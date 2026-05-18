@@ -238,7 +238,7 @@ def show_parts(selected_cat_id):
                     html.Td(
                         dcc.Link(
                             part.oem_num,
-                            href=f'/original_catalogs/',
+                            href=f'/original_catalogs/analogs/{part.id}',
                             style={'fontFamily': 'monospace',
                                    'width': '150px',
                                    'display': 'block',
