@@ -20,8 +20,8 @@ def set_token():
     response = make_response(redirect("/"))
     response.set_cookie(
         "auth_token", token,
-        # max_age=7 * 24 * 60 * 60,
-        max_age=60*5,
+        max_age=7 * 24 * 60 * 60,
+        # max_age=60*5,
         httponly=True,
         secure=False,
         samesite="Lax"

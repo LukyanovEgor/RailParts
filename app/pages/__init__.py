@@ -10,3 +10,4 @@ from .auth.login_page import login_layout
 
 from .admin.admin_page import layout as admin_layout
 
+from .analogue_to_part.analogue_page import analogue_parts_layout
