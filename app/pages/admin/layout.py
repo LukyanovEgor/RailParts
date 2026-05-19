@@ -13,6 +13,10 @@ class Layout:
                     n_intervals=0
                 ),
 
+                dcc.Download(id="download-pdf"),
+
+                html.Div(id='dummy-output', style={'display': 'none'}),
+
                 html.Div(Header()(), className="card-header"),
                 html.Div(
                     [
