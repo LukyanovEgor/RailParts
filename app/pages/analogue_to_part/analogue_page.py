@@ -2,6 +2,10 @@ from dash import html, dcc, callback, ctx, no_update, Input, Output, State, ALL
 from app.pages.header import Header
 from app.models import OEMParts, AnalogueParts
 from app.db import get_db
+import json
+import jwt
+from flask import request
+from app.order_services.make_order import make_order
 
 
 def analogue_parts_layout(oem_part_id=None):
@@ -73,24 +77,15 @@ def analogue_parts_layout(oem_part_id=None):
                                 ], style={'flex': 1}
                             ),
 
-                            # Цена и кнопка (справа)
+                            # кнопка (справа)
                             html.Div(
                                 [
                                     html.Div(
                                         [
                                             html.Button(
                                                 'Заказ',
-                                                className="btn_style",
-                                                style={
-                                                    'backgroundColor': '#007bff',
-                                                    'color': 'white',
-                                                    'border': 'none',
-                                                    'padding': '10px 24px',
-                                                    'borderRadius': '6px',
-                                                    'cursor': 'pointer',
-                                                    'fontWeight': '500',
-                                                    'fontSize': '14px'
-                                                }
+                                                id={'type': 'order-btn', 'part_id': oem_part_id, 'part_type': 'oem'},
+                                                className="btn_style"
                                             )
                                         ]
                                     )
@@ -109,13 +104,15 @@ def analogue_parts_layout(oem_part_id=None):
             # Аналоги
             html.Div(
                 [
-                    html.H3('Аналоги', style={'marginBottom': '20px', 'color': '#007bff'}),
+                    html.H3('Аналоги', style={'marginBottom': '20px', 'color': '#8B0000'}),
 
                     html.Div(
                         [
                             create_analogue_card(part) for part in analogue_parts
                         ]
-                    )
+                    ),
+
+                    html.Div(id='order-notification-analogue', style={'marginBottom': '15px'}),
                 ]
             ),
         ], style={'padding': '20px', 'maxWidth': '1200px', 'margin': '0 auto'}
@@ -187,24 +184,16 @@ def create_analogue_card(part):
                         ], style={'flex': 1}
                     ),
 
-                    # Цена и кнопка (справа)
+                    # кнопка (справа)
                     html.Div(
                         [
                             html.Div(
                                 [
                                     html.Button(
                                         'Заказ',
-                                        className="btn_style",
-                                        style={
-                                            'backgroundColor': '#007bff',
-                                            'color': 'white',
-                                            'border': 'none',
-                                            'padding': '10px 24px',
-                                            'borderRadius': '6px',
-                                            'cursor': 'pointer',
-                                            'fontWeight': '500',
-                                            'fontSize': '14px'
-                                        }
+                                        id={'type': 'order-btn', 'part_id': part.id, 'part_type': 'analogue'},
+                                        # 👈 добавлено
+                                        className="btn_style"
                                     )
                                 ]
                             )
@@ -219,3 +208,64 @@ def create_analogue_card(part):
             )
         ], style={'marginBottom': '10px'}
     )
+
+
+@callback(
+    Output('order-notification-analogue', 'children'),
+    Input({'type': 'order-btn', 'part_id': ALL, 'part_type': ALL}, 'n_clicks'),
+    prevent_initial_call=True
+)
+def handle_analogue_order(n_clicks_list):
+    if not any(n_clicks_list):
+        return no_update
+
+    triggered = ctx.triggered
+    if not triggered:
+        return no_update
+
+    # 1️⃣ Парсим ID нажатой кнопки
+    prop_id = triggered[0]['prop_id']
+    id_data = json.loads(prop_id.split('.n_clicks')[0])
+    part_id = id_data['part_id']
+    part_type = id_data['part_type']
+
+    # 2️⃣ Проверка авторизации (как в прошлом примере)
+    token = request.cookies.get('auth_token')
+    if not token:
+        return html.Div(
+            "🔐 Войдите в аккаунт, чтобы оформить заказ",
+            style={'color': '#dc3545', 'padding': '10px', 'backgroundColor': '#fff3cd', 'borderRadius': '4px'}
+            )
+
+    try:
+        # Замените на ваш реальный SECRET_KEY
+        payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+        user_id = payload.get("user_id")
+        if not user_id:
+            return html.Div("️ Сессия невалидна", style={'color': '#dc3545', 'padding': '10px'})
+    except jwt.ExpiredSignatureError:
+        return html.Div("⏳ Срок действия сессии истёк", style={'color': '#dc3545', 'padding': '10px'})
+    except jwt.InvalidTokenError:
+        return html.Div("🔒 Ошибка токена", style={'color': '#dc3545', 'padding': '10px'})
+
+    # 3️⃣ Вызов вашей функции make_order
+    try:
+
+        make_order(
+            db=get_db(),
+            user_id=user_id,
+            part_id=part_id,
+            is_oem=part_type == 'oem'
+        )
+
+        part_name = "Оригинал" if part_type == "oem" else "Аналог"
+        return html.Div(
+            f"✅ {part_name} #{part_id} успешно добавлен в заказ!",
+            style={'color': '#155724', 'padding': '10px', 'backgroundColor': '#d4edda', 'borderRadius': '4px',
+                   'fontWeight': '500'}
+            )
+    except Exception as e:
+        return html.Div(
+            f"❌ Ошибка при оформлении: {str(e)}",
+            style={'color': '#721c24', 'padding': '10px', 'backgroundColor': '#f8d7da', 'borderRadius': '4px'}
+            )

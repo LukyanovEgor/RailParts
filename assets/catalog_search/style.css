@@ -1,0 +1,150 @@
+/* Контейнер для двух карточек */
+.searcher-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Базовая карточка - УВЕЛИЧЕНА */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    min-width: 450px;      /* Было 320px */
+    max-width: 600px;      /* Было 400px */
+    flex: 1;               /* Карточки растягиваются */
+}
+
+.search-card, .name-card {
+    min-height: 200px;
+}
+
+.card-title {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.card-label {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Строка поиска */
+.search-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* Поле ввода - теперь шире */
+.search-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 300px;      /* Минимальная ширина */
+}
+
+.search-input:focus {
+    border-color: #007bff;
+}
+
+.card-hint {
+    font-size: 13px;
+    color: #718096;
+}
+
+.card-hint .example-link {
+    color: #007bff;
+    text-decoration: none;
+    margin: 0 2px;
+}
+
+.card-hint .example-link:hover {
+    text-decoration: underline;
+}
+
+/* Разделитель между карточками */
+.divider {
+    width: 1px;
+    background: #e2e8f0;
+    align-self: stretch;
+    margin: 0 8px;
+}
+
+/* Кнопка btn_style */
+
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .card {
+        min-width: 350px;
+        max-width: 450px;
+    }
+}
+
+@media (max-width: 768px) {
+    .searcher-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    .card {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .search-row {
+        flex-direction: column;
+    }
+
+    .search-input {
+        min-width: 100%;
+    }
+
+    .btn_style {
+        width: 100%;
+    }
+}
+
+
+.catalog-wrapper {
+    width: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+    flex: 1; /* Если родитель использует display: flex */
+}
+
+.output-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 30px;
+    width: 100%;
+    height: auto; /* Растягивается по содержимому */
+    min-height: 150px; /* Только чтобы не схлопывалась до 0px пока пустая */
+    box-sizing: border-box;
+    margin-top: 24px;
+    display: block;
+    overflow: visible;
+    transition: height 0.2s ease;
+}

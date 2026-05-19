@@ -1,6 +1,7 @@
+from app import pages_registration
 from app.pages_registration import page_registration
 from flask import Flask, send_from_directory, request, redirect
-from app.routes.auth import auth_bp
+from app.routes import auth_bp, orders_bp
 import dash
 import os
 
@@ -10,6 +11,7 @@ server = Flask(__name__)
 server.secret_key = os.urandom(24)  # В продакшене используйте фиксированный секрет
 
 server.register_blueprint(auth_bp)
+server.register_blueprint(orders_bp)
 
 app = dash.Dash(__name__, use_pages=True, server=server, pages_folder='app/pages')
 

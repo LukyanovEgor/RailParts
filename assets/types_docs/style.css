@@ -1,0 +1,95 @@
+/* Info bar */
+.info-bar {
+    padding: 16px 24px;
+    margin: 20px auto;
+    max-width: 1200px;
+    color: #4a5568;
+    font-size: 15px;
+}
+
+/* Сетка для двух верхних карточек */
+.top-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Базовая карточка */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.search-card, .name-card {
+    min-height: 180px;
+}
+
+.card-title {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fffff;
+}
+
+.card-label {
+    display: block;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Поле ввода и кнопка */
+.search-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: #007bff;
+}
+
+.card-hint {
+    margin: 0;
+    font-size: 13px;
+    color: #718096;
+}
+
+/* Карточка с результатом */
+.result-card {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .top-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-row {
+        flex-direction: column;
+    }
+}
