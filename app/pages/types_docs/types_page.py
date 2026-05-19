@@ -7,9 +7,7 @@ from app.db import get_db
 
 def types_docs_layout(train_type_id=None):
     db = get_db()
-
     categories = []
-
     data = get_categories_tree(db, train_type_id)
 
     for category in data:
@@ -17,27 +15,18 @@ def types_docs_layout(train_type_id=None):
 
     return html.Div(
         [
-
             dcc.Store(id='selected-cat-id-store', data=None),
             dcc.Store(id='train-type-id-store', data=train_type_id),
 
             html.Div(Header()(), className="card-header"),
 
-            html.Div(
-                [
-                    html.P(f'Тип поезда: {train_type_id}')
-                ], style={
-                    'backgroundColor': '#f0ffff',
-                }
-            ),
-
+            # Основной блок: категории + картинка
             html.Div(
                 [
                     html.Div(
                         [
                             html.H2('Оригинальные каталоги', style={'textAlign': 'left', 'margin': '0 0 8px'}),
                             html.P('Выберите категорию', style={'textAlign': 'center', 'margin': '0 0 24px'}),
-
                             dcc.Loading(
                                 id="loading-catalog",
                                 type="circle",
@@ -46,7 +35,7 @@ def types_docs_layout(train_type_id=None):
                         ], style={
                             'display': 'flex', 'flexDirection': 'column',
                             'gap': '20px', 'padding': '30px', 'width': '320px',
-                             'flexShrink': 0,
+                            'flexShrink': 0,
                         }
                     ),
                     html.Div(id='img_output')
@@ -54,15 +43,23 @@ def types_docs_layout(train_type_id=None):
                     'display': 'flex', 'flexDirection': 'row',
                     'gap': '20px',
                     'padding': '32px 24px',
-                    'marginTop': '20px', 'border': '2px solid',
-                    'align-items': 'flex-start',
+                    'marginTop': '20px',
+
+                    # 👇 Добавлено: стиль карточки
+                    'border': '1px solid #e2e8f0',
+                    'borderRadius': '12px',
+                    'backgroundColor': '#ffffff',
+                    'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.08)',
+                    'width': '100%',
+                    'boxSizing': 'border-box',
+
+                    'alignItems': 'flex-start',
                 }
             ),
 
             html.Div(id='parts-table')
         ]
     )
-
 
 @callback(
     Output('categories-container', 'children'),
@@ -223,9 +220,6 @@ def show_parts(selected_cat_id):
         return None
 
     db = get_db()
-
-    # parts = db.query(OEMParts).all()
-
     parts = db.query(OEMParts).filter_by(category_id=selected_cat_id).all()
 
     rows = []
@@ -243,7 +237,6 @@ def show_parts(selected_cat_id):
                                    'width': '150px',
                                    'display': 'block',
                                    'textAlign': 'center'}
-
                         ), style={'width': '150px',
                                   'padding': '10px',
                                   'verticalAlign': 'middle'}
@@ -262,13 +255,13 @@ def show_parts(selected_cat_id):
                             'Название', style={'padding': '10px',
                                                'backgroundColor': '#f8f9fa',
                                                'textAlign': 'left'}
-                            ),
+                        ),
                         html.Th(
                             'Оригинальный номер', style={
                                 'padding': '10px',
                                 'backgroundColor': '#f8f9fa',
                                 'textAlign': 'left'}
-                            ),
+                        ),
                     ]
                 )
             ),
@@ -285,6 +278,14 @@ def show_parts(selected_cat_id):
             'display': 'flex', 'flexDirection': 'row',
             'gap': '20px',
             'padding': '32px 24px',
-            'marginTop': '20px', 'border': '2px solid'
+            'marginTop': '20px',
+
+            # 👇 Новый стиль карточки вместо старой рамки
+            'border': '1px solid #e2e8f0',
+            'borderRadius': '12px',
+            'backgroundColor': '#ffffff',
+            'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.08)',
+            'width': '100%',
+            'boxSizing': 'border-box',
         }
-        )
+    )

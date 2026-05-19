@@ -19,7 +19,6 @@ def check_jwt_and_render(_):
 
     token = request.cookies.get('auth_token')
 
-    # from dash import html
     try:
         # 2. Декодируем токен (замените на ваш SECRET_KEY)
         try:

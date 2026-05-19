@@ -5,6 +5,8 @@ class Layout:
     def __init__(self):
         self.layout = html.Div(
             [
+                dcc.Location(id='url-redirect', refresh=True),
+
                 Header()(),
 
                 html.Div(
@@ -19,7 +21,9 @@ class Layout:
                             ], className="search-box"
                         ),
 
-                        html.Div(id="product-grid", className="grid")
+                        html.Div(id="product-grid", className="grid"),
+
+                        html.Div(id='order-notification', style={'marginTop': '10px'})
                     ]
                 )
             ]

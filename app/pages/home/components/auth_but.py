@@ -7,7 +7,7 @@ class AuthBut:
             'Зарегистрироваться или войти',
             id='show-auth-modal',  # ID для callback
             style={
-                'backgroundColor': '#007bff',
+                'backgroundColor': '#8B0000',
                 'color': 'white',
                 'border': 'none',
                 'padding': '10px 20px',

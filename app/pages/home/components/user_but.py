@@ -22,7 +22,7 @@ class UserBut:
             ],
             id='show-profile-modal',
             style={
-                'backgroundColor': '#007bff', 'color': 'white', 'border': 'none',
+                'backgroundColor': '#8B0000', 'color': 'white', 'border': 'none',
                 'padding': '8px 14px',
                 'display': 'inline-flex', 'alignItems': 'center',
                 'cursor': 'pointer', 'borderRadius': '6px',

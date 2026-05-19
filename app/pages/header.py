@@ -9,7 +9,7 @@ class Header:
 
             dcc.Store(id='store-search-data'),
 
-            dcc.Link('RailParts',
+            dcc.Link('Рельсы-Шпалы',
                      href='/')
             ,
 

@@ -15,8 +15,6 @@ def register_layout():
     }
     input_style = {'padding': '8px', 'margin': '5px 0 10px', 'width': '100%', 'boxSizing': 'border-box'}
     label_style = {'fontWeight': 'bold', 'marginTop': '10px', 'display': 'block'}
-    btn_style = {'padding': '10px', 'backgroundColor': '#007BFF', 'color': '#fff', 'border': 'none',
-                 'borderRadius': '4px', 'cursor': 'pointer', 'width': '100%', 'marginTop': '10px', 'fontSize': '16px'}
 
     return html.Div([
     html.H2("Регистрация", style={'textAlign': 'center'}),
@@ -42,7 +40,7 @@ def register_layout():
     html.Label("Пароль *", style=label_style),
     dcc.Input(id="password", type="password", placeholder="Минимум 6 символов", style=input_style),
 
-    html.Button("Зарегистрироваться", id="submit-btn", style=btn_style, n_clicks=0),
+    html.Button("Зарегистрироваться", id="submit-btn", className='btn_style', n_clicks=0),
     html.Div(id="output-message", style={'marginTop': '15px', 'textAlign': 'center', 'fontWeight': 'bold'}),
         dcc.Location(id="redirect", refresh=False)  # <-- для редиректов
 ], style=form_style)

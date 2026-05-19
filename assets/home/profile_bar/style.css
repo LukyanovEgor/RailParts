@@ -1,0 +1,58 @@
+/* Контейнер профиля */
+.profile-bar {
+    background-color: white;
+    padding: 30px;
+    margin-right: 50px;
+    border-radius: 8px;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.profile-title {
+    margin: 0 0 20px 0;
+    color: #1a202c;
+    font-size: 22px;
+}
+
+/* Ссылки строго в столбик */
+.profile-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.profile-link {
+    text-decoration: none;
+    color: #8B0000;
+    font-size: 16px;
+    padding: 4px 0;
+    transition: color 0.2s, text-decoration 0.2s;
+}
+
+.profile-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Кнопка закрытия */
+.btn_style_profile {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn_style_profile:hover {
+    background-color: #0056b3;
+}
