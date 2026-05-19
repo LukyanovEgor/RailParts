@@ -10,8 +10,9 @@ import os
 server = Flask(__name__)
 server.secret_key = os.urandom(24)  # В продакшене используйте фиксированный секрет
 
+
 server.register_blueprint(auth_bp)
-server.register_blueprint(orders_bp)
+
 
 app = dash.Dash(__name__, use_pages=True, server=server, pages_folder='app/pages')
 
