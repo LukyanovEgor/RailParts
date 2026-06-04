@@ -188,7 +188,7 @@ from app.db import get_db
     prevent_initial_call=True
 )
 def trigger_pdf_download(n_clicks_list):
-    # 🛡️ Guard clause: если ни одна кнопка не нажата (все None или 0) → ничего не делаем
+    # Guard clause: если ни одна кнопка не нажата (все None или 0) → ничего не делаем
     if not n_clicks_list or all(nc is None or nc == 0 for nc in n_clicks_list):
         return no_update
 

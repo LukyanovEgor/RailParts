@@ -2,13 +2,20 @@ from dash import html
 
 
 class UserBut:
-    def __init__(self, username="User"):
+    def __init__(self, username="User", icon=None):
+
+        style = {'width': '20px', 'height': '20px', 'borderRadius': '4px'}
+
+        if icon is None:
+            icon = '/assets/no_icon_user.png'
+            style={'width': '12px', 'height': '12px', 'borderRadius': '4px'}
+
         self.but = html.Button(
             children=[
                 html.Div(
                     html.Img(
-                        src='/assets/no_icon_user.png',
-                        style={'width': '12px', 'height': '12px', 'filter': 'brightness(0) invert(1)'}
+                        src=icon,
+                        style=style
                     ),
                     style={
                         'width': '20px', 'height': '20px',
@@ -21,6 +28,7 @@ class UserBut:
                 html.Span(username, style={'fontWeight': '500', 'fontSize': '15px'})
             ],
             id='show-profile-modal',
+            n_clicks=0,
             style={
                 'backgroundColor': '#8B0000', 'color': 'white', 'border': 'none',
                 'padding': '8px 14px',

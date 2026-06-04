@@ -14,7 +14,11 @@ server.secret_key = os.urandom(24)  # В продакшене используй
 server.register_blueprint(auth_bp)
 
 
-app = dash.Dash(__name__, use_pages=True, server=server, pages_folder='app/pages')
+app = dash.Dash(__name__,
+                use_pages=True,
+                server=server,
+                pages_folder='app/pages',
+                suppress_callback_exceptions=True)
 
 
 page_registration()
