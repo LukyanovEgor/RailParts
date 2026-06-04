@@ -1,11 +1,33 @@
 from .layout import Layout
 from dash import ctx, callback, callback_context, Output, Input
-from .components import AuthBut, UserBut, AuthBar
+from .components import AuthBut, UserBut, AuthBar, ProfileBar
 from app.models import Users
 from app.db import get_db
 from flask import request
 import jwt
 
+
+def get_user_info():
+    token = request.cookies.get('auth_token')
+
+    try:
+        # 2. Декодируем токен (замените на ваш SECRET_KEY)
+        try:
+            payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+        except Exception as e:
+
+            return None
+
+        user_id = payload.get("user_id")
+
+        if user_id:
+            db = get_db()
+
+            user = db.query(Users).filter(Users.user_id == user_id).first()
+
+            return user
+    except Exception as e:
+        return None
 
 layout = Layout()
 
@@ -17,33 +39,26 @@ layout = Layout()
 )
 def check_jwt_and_render(_):
 
-    token = request.cookies.get('auth_token')
+    user = get_user_info()
 
-    try:
-        # 2. Декодируем токен (замените на ваш SECRET_KEY)
-        try:
-            payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
-        except Exception as e:
-
-            return AuthBut()()
-
-        user_id = payload.get("user_id")
-
-        if user_id:
-
-            db = get_db()
-
-            user = db.query(Users).filter(Users.user_id == user_id).first()
-
-            return UserBut(username=user.firstname)()
-
-        return AuthBut()()
-
-    except Exception as e:
-        print(e)
-        return AuthBut()()
+    if user:
+        return UserBut(username=user.firstname, icon=user.icon)()
+    return AuthBut()()
 
 
+@callback(
+    Output('modal-profile-overlay', 'children'),
+    Input('auth-trigger', 'data'),
+    prevent_initial_call=False
+)
+def render_profile_overlay(_):
+
+    user = get_user_info()
+
+    if not user:
+        return [ProfileBar()()]
+
+    return [ProfileBar(user_id=user.user_id)()]
 # Callback для управления видимостью окна авторизации
 @callback(
     Output("modal-overlay", "style"),

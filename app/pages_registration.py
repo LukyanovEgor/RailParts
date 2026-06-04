@@ -6,7 +6,8 @@ from app.pages import (home_layout,
                     login_layout,
                     parts_layout,
                     admin_layout,
-                    analogue_parts_layout)
+                    analogue_parts_layout,
+                    profile_layout)
 
 
 def page_registration():
@@ -30,3 +31,8 @@ def page_registration():
                        path_template='/original_catalogs/analogs/<oem_part_id>',
                        title='Analogs',
                        layout=analogue_parts_layout)
+
+    dash.register_page('Profile',
+                       path_template='/profile/<user_id>',
+                       title='Profile',
+                       layout=profile_layout)
