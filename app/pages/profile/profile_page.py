@@ -94,11 +94,6 @@ def profile_layout(user_id=None):
                                 style={'border': '1px solid #eee',
                                        'padding': '10px'}
                             ),
-                            # html.Td(
-                            #     f"{items_list}", style={'border': '1px solid #eee',
-                            #                               'padding': '10px',
-                            #                               'color': '#28a745'}
-                            # ),
                             html.Td(html.Div(items_list), style={'border': '1px solid #eee',
                                                           'padding': '10px',
                                                           'fontSize': '10px'
@@ -317,7 +312,7 @@ def profile_layout(user_id=None):
                                                             ]
                                                         )
                                                     ),
-                                                    html.Tbody(*orders)
+                                                    html.Tbody(orders)
                                                 ]
                                             )
                                         ]

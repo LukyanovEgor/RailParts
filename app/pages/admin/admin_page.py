@@ -1,162 +1,40 @@
 from .layout import Layout
 from dash import Output, Input, callback, html, callback_context, ALL, no_update, ctx, dcc
 import dash
+from .order_services import render_all, render_by_users, render_filtered_table
 from sqlalchemy.orm import joinedload
 from sqlalchemy import select
-from app.models import Orders, OrderItems, OEMParts, AnalogueParts, Users
+from app.models import Orders
 from app.db import get_db
 
 
 layout = Layout()
 
-
+# переключатель
 @callback(
-    Output("order-table", "children"),
-    Input("data-refresh-interval", "data"),
-    prevent_initial_call=False
+    Output('data-store', 'data'),
+    Output('all-type', 'data-state'),
+    Output('by-user-type', 'data-state'),
+    Input('by-user-type', 'n_clicks'),
+    Input('all-type', 'n_clicks'),
+    prevent_initial_call=True
 )
-def render_table(data):
-    db = get_db()
-    try:
-        # Загружаем заказы сразу с элементами и привязанными деталями (без N+1 запросов)
-        orders = db.query(Orders).options(
-            joinedload(Orders.items).joinedload(OrderItems.oem_part),
-            joinedload(Orders.items).joinedload(OrderItems.analogue_part)
-        ).all()
+def switch(n1, n2):
+    triggered = ctx.triggered_id
+    if triggered == 'all-type':
+        return 'all-type', 'active', 'inactive'
+    return 'by-user-type', 'inactive', 'active'
 
-        if not orders:
-            return html.Div(
-                "Заказы пока не оформлены",
-                style={'textAlign': 'center', 'padding': '40px', 'color': '#718096'}
-            )
+#модуль данных
+@callback(
+    Output('order-table', 'children'),
+    Input('data-store', 'data')
+)
+def render_data(active_tab):
 
-        rows = []
-        for order in orders:
-            # Формируем список товаров с количеством
-            items_list = []
-            if order.items:
-                for item in order.items:
-                    part_info = "Неизвестная деталь"
-                    if item.oem_part:
-                        part_info = f"{item.oem_part.name} ({item.oem_part.oem_num})"
-                    elif item.analogue_part:
-                        part_info = f"{item.analogue_part.name} ({item.analogue_part.analogue_num})"
-
-                    items_list.append(
-                        html.Div(f" {part_info} - {item.quantity} шт.", style={'marginBottom': '6px'})
-                    )
-            else:
-                items_list.append(html.Div("Пустой заказ", style={'color': '#a0aec0'}))
-
-            # Безопасное форматирование даты
-            created_date = order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '-'
-
-            stmt = (
-                select(Users)
-                .where(Users.user_id == order.user_id)
-            )
-
-            user = db.scalar(stmt)
-
-            firstname = user.firstname if user else ''
-            lastname =  user.lastname if user else ''
-            patronymic = user.patronymic if user else ''
-
-            rows.append(
-                html.Tr(
-                    [
-                        html.Td(order.id, style={'padding': '12px',
-                                                'textAlign': 'center',
-                                                 'fontWeight': 'bold'
-                                                 }),
-                        html.Td(f"{lastname} {firstname} {patronymic}", style={'padding': '12px'}),
-                        html.Td(html.Div(items_list), style={'padding': '12px'}),
-                        html.Td(created_date, style={
-                                                        'padding': '12px',
-                                                        'whiteSpace': 'nowrap',
-                                                        'textAlign': 'center'
-                                                    }),
-                        html.Td(f'{order.status}', style={
-                                                            'padding': '12px',
-                                                            'whiteSpace': 'nowrap',
-                                                            'textAlign': 'center'
-                                                            }),
-                        html.Td(
-                            html.Button(
-                                "Создать документ",
-                                id={'type': 'btn-create-doc', 'index': order.id},
-                                className='btn_style',
-                                n_clicks=0
-                            ),
-                            style={'padding': '12px', 'textAlign': 'center'}
-                        )
-                    ], style={'borderBottom': '1px solid #e2e8f0'}
-                )
-            )
-
-        table = html.Table(
-            [
-                html.Thead(
-                    html.Tr(
-                        [
-                            html.Th(
-                                '№', style={'padding': '12px', 'backgroundColor': '#f8f9fa', 'textAlign': 'center'}
-                                ),
-                            html.Th('Оформитель', style={
-                                                            'padding': '12px',
-                                                            'backgroundColor': '#f8f9fa',
-                                                            'textAlign': 'left'
-                                                        }),
-                            html.Th('Состав заказа', style={
-                                                                'padding': '12px',
-                                                                'backgroundColor': '#f8f9fa',
-                                                                'textAlign': 'left'
-                                                            }),
-                            html.Th(
-                                'Дата формирования',
-                                style={'padding': '12px',
-                                       'backgroundColor': '#f8f9fa',
-                                       'whiteSpace': 'nowrap',
-                                       'align': 'center'}
-                                ),
-
-                            html.Th(
-                                'Статус',
-                                style={'padding': '12px', 'backgroundColor': '#f8f9fa', 'textAlign': 'center'}
-                            ),
-
-                            html.Th(
-                                'Действие',
-                                style={'padding': '12px', 'backgroundColor': '#f8f9fa', 'textAlign': 'center'}
-                                )
-                        ]
-                    )
-                ),
-                html.Tbody(rows)
-            ], style={
-                'width': '100%',
-                'borderCollapse': 'collapse',
-                'fontFamily': 'Arial, sans-serif',
-                'fontSize': '14px'
-            }
-        )
-
-        return html.Div(
-            [table], style={
-                'border': '1px solid #e2e8f0',
-                'borderRadius': '12px',
-                'backgroundColor': '#ffffff',
-                'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.08)',
-                'width': '100%',
-                'boxSizing': 'border-box',
-                'padding': '20px',
-                'marginTop': '20px'
-            }
-            )
-
-    except Exception as e:
-        return html.Div(f"Ошибка загрузки: {str(e)}", style={'color': '#e53e3e', 'padding': '20px'})
-
+    if active_tab == 'all-type':
+        return render_all()
+    return render_by_users()
 
 @callback(
     Output("dummy-output", "children"),
@@ -176,11 +54,6 @@ def handle_create_document(n_clicks_list):
         return dash.no_update  # В реальном проекте лучше использовать dcc.Download, но redirect проще
 
     return no_update
-
-
-from dash import callback, Output, Input, ALL, no_update, ctx, dcc
-from app.models import Orders
-from app.db import get_db
 
 @callback(
     Output("download-pdf", "data"),
@@ -202,6 +75,18 @@ def trigger_pdf_download(n_clicks_list):
         if order:
             from app.pages.admin.create_doc.create_order_doc import generate_order_pdf
             pdf_buffer = generate_order_pdf(order, db)
+
+            db.query(Orders).filter_by(id=order_id).update({"status": "В работе"})
+            db.commit()
+
             return dcc.send_bytes(pdf_buffer.getvalue(), filename=f"Zakaz_Naryad_{order_id}.pdf")
 
     return no_update
+
+
+@callback(
+    Output("filtered-table", "children"),
+    Input("input-order", "value")
+)
+def filtered_table(filter):
+    return render_filtered_table(filter)

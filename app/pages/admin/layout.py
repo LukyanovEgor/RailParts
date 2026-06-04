@@ -1,5 +1,5 @@
 from dash import html, dcc
-# from .components import CatalogBut, AuthBar, ProfileBar, PartsBut
+from .components import ORDERS_SWITCH
 from app.pages.header import Header
 
 
@@ -13,6 +13,8 @@ class Layout:
                     n_intervals=0
                 ),
 
+                dcc.Store(id='data-store', data='all-type'),
+
                 dcc.Download(id="download-pdf"),
 
                 html.Div(id='dummy-output', style={'display': 'none'}),
@@ -22,9 +24,11 @@ class Layout:
                     [
                         html.H2('Заказы запчастей со склада'),
 
+                        html.Div(
+                            [ORDERS_SWITCH], className="buttons-row"
+                        ),
+
                         html.Div(id='order-table'),
-
-
 
                     ]
                 )
