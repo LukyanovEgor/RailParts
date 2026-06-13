@@ -29,7 +29,7 @@ class AuthBar:
                 'marginRight': '50px',
                 'borderRadius': '8px',
                 'maxWidth': '400px'
-            }
+            },
         )
 
     def __call__(self, *args, **kwargs):

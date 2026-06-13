@@ -91,7 +91,7 @@ def toggle_modal(open_clicks, close_clicks):
 # Callback для управления видимостью окна профиля
 @callback(
     Output("modal-profile-overlay", "style"),
-    Input("show-profile-modal", "n_clicks"),
+    Input("show-profile-modal1", "n_clicks"),
     Input("close-profile-btn", "n_clicks"),
     prevent_initial_call=True
 )
@@ -103,7 +103,7 @@ def toggle_modal_profile(open_clicks, close_clicks):
 
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-    if button_id == "show-profile-modal" and open_clicks:
+    if button_id == "show-profile-modal1" and open_clicks:
         return {
             'position': 'fixed',
             'top': 0, 'left': 0, 'right': 0, 'bottom': 0,

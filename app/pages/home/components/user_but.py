@@ -27,7 +27,7 @@ class UserBut:
                 ),
                 html.Span(username, style={'fontWeight': '500', 'fontSize': '15px'})
             ],
-            id='show-profile-modal',
+            id='show-profile-modal1',
             n_clicks=0,
             style={
                 'backgroundColor': '#8B0000', 'color': 'white', 'border': 'none',

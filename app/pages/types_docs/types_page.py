@@ -3,6 +3,8 @@ from app.pages.header import Header
 from .services import get_categories_tree, show_image
 from app.models import OEMParts
 from app.db import get_db
+import dash_bootstrap_components as dbc
+import json
 
 
 def types_docs_layout(train_type_id=None):
@@ -44,8 +46,6 @@ def types_docs_layout(train_type_id=None):
                     'gap': '20px',
                     'padding': '32px 24px',
                     'marginTop': '20px',
-
-                    # 👇 Добавлено: стиль карточки
                     'border': '1px solid #e2e8f0',
                     'borderRadius': '12px',
                     'backgroundColor': '#ffffff',
@@ -57,7 +57,38 @@ def types_docs_layout(train_type_id=None):
                 }
             ),
 
-            html.Div(id='parts-table')
+            html.Div(id='parts-table'),
+
+            dbc.Modal(
+                [
+                    dbc.ModalBody(
+                        id="modal-content",
+                        style={
+                            'minHeight': '300px',
+                            'padding': '30px'
+                        }
+                    ),
+                    dbc.ModalFooter(
+                        dbc.Button(
+                            "Закрыть",
+                            id="close-modal-btn",
+                            className="ms-auto",
+                            color="secondary"
+                        )
+                    )
+                ],
+                id="point-modal",
+                is_open=False,
+                size="sm",
+                centered=True,
+                fade=True,
+                scrollable=True,
+                style={
+                    'zIndex': '9999',  # Самый верхний слой
+                },
+                backdrop=True
+
+            )
         ]
     )
 
@@ -151,64 +182,223 @@ def show_catalog(train_type_id):
     prevent_initial_call=True
 )
 def handle_category_click(n_clicks_list, train_type_id):
-    DATA = {
-        "current_image": {
-            "url": "https://your-storage.com/image.png",  # Ссылка на вашу картинку
-            "points": [
-                {"id": 1, "x": 0.42, "y": 0.06, "text": "1"},
-                # {"id": 2, "x": 0.55, "y": 0.85, "text": "2"},
-                # {"id": 3, "x": 0.05, "y": 0.05, "text": "11"},
-                # Добавьте точки, соответствующие вашей картинке
-            ]
-        }
-    }
+    db = get_db()
 
     if not n_clicks_list or all(click is None for click in n_clicks_list):
-        return no_update
+        return no_update, no_update
 
     triggered = ctx.triggered_id
     if isinstance(triggered, dict) and triggered.get('type') == 'category-link':
         category_id = triggered['index']
-
-        url = show_image(db=get_db(), part_category_id=category_id)
+        url = show_image(db=db, part_category_id=category_id)
 
         if url:
-            return html.Div(
+            data = db.query(OEMParts).filter(OEMParts.category_id == category_id).all()
 
-                html.Div(
-                    [
-                        # Сама картинка
-                        html.Img(
-                            src=f"{url}",
-                            style={"width": "100%", "height": "auto", "display": "block"}
-                        ),
-                        # Слой с кнопками (генерируется циклом)
-                        *[
-                            html.Button(
-                                p["text"],
-                                id={"type": "point-btn", "index": p["id"]},
-                                style={
-                                    "position": "absolute",
-                                    "left": f"{p['x'] * 100}%",
-                                    "top": f"{p['y'] * 100}%",
-                                    "transform": "translate(-50%, -50%)",  # Центрируем кнопку по координате
-                                    "background": "yellow",  # Для теста, потом можно прозрачный
-                                    "border": "1px solid black",
-                                    "borderRadius": "50%",
-                                    "width": "24px",
-                                    "height": "24px",
-                                    "cursor": "pointer",
-                                    "zIndex": 10
+            points = []
+            for part in data:
+                if part.img_coordinates:
+                    try:
+                        coords = json.loads(part.img_coordinates)
+
+                        # Если в БД лежит словарь, оборачиваем в список
+                        if isinstance(coords, dict):
+                            coords = [coords]
+                        elif not isinstance(coords, list):
+                            continue
+
+                        for coord in coords:
+                            if isinstance(coord, dict):
+                                # Добавляем ID детали к координатам для надежности
+                                new_point = {
+                                    **coord,
+                                    'part_db_id': part.id
                                 }
-                            ) for p in DATA["current_image"]["points"]
-                        ]
-                    ],
-                    style={"position": "relative", "width": "800px", "margin": "0 auto"}  # Фикс ширина для примера
+                                points.append(new_point)
+                    except (json.JSONDecodeError, TypeError) as e:
+                        print(f"Ошибка парсинга JSON для детали {part.id}: {e}")
+
+            # Генерируем кнопки
+            buttons = []
+            for point in points:
+                # Берем ID из JSON (тот самый, что вы записали: 1, 33 и т.д.)
+                point_id = point.get('id')
+                part_id = point.get('part_db_id')
+
+                buttons.append(
+                    html.Button(
+                        children=str(point_id),  # <-- ВИДИМЫЙ ТЕКСТ НА КНОПКЕ
+                        id={"type": "point-btn", "index": part_id},  # <-- ID ДЛЯ КОЛБЭКА
+                        style={
+                            "position": "absolute",
+                            "left": f"{point['x'] * 100}%",
+                            "top": f"{point['y'] * 100}%",
+                            "transform": "translate(-50%, -50%)",
+                            "background": "yellow",
+                            "border": "1px solid black",
+                            "borderRadius": "50%",
+                            "width": "24px",
+                            "height": "24px",
+                            "cursor": "pointer",
+                            "zIndex": 10,
+                            "fontWeight": "bold",
+                            "fontSize": "12px"
+                        }
+                    )
                 )
+
+            return html.Div(
+                [
+                    html.Div(
+                        [
+                            html.Img(src=f"{url}", style={"width": "100%", "height": "auto", "display": "block"}),
+                            *buttons
+                        ],
+                        style={"position": "relative", "width": "800px", "margin": "0 auto"}
+                    ),
+                ]
             ), category_id
+
         return None, None
     return no_update, None
 
+@callback(
+    Output("point-modal", "is_open"),
+    Output("modal-content", "children"),
+    Input({"type": "point-btn", "index": ALL}, "n_clicks"),
+    Input("close-modal-btn", "n_clicks"),
+    State("point-modal", "is_open"),
+    prevent_initial_call=True
+)
+def toggle_modal(point_clicks, close_clicks, is_open):
+    db = get_db()
+
+    triggered = ctx.triggered_id
+
+    if triggered == "close-modal-btn":
+        if close_clicks and close_clicks > 0:  # Проверяем, что кнопка реально нажата
+            return False, no_update
+        return no_update, no_update  # Игнорируем начальную загрузку
+
+    # Если нажали на кнопку точки
+    if isinstance(triggered, dict) and triggered.get('type') == 'point-btn':
+
+        if not point_clicks or all(click is None or click == 0 for click in point_clicks):
+            return no_update, no_update
+
+        part_id = triggered['index']
+        point_data = db.query(OEMParts).filter(OEMParts.id == part_id).first()
+
+        if not point_data:
+            return no_update, html.Div("Деталь не найдена", style={'color': 'red'})
+
+
+        extracted_point_id = None
+
+        if point_data.img_coordinates:
+            try:
+                # 1. Превращаем строку '[{"id": 2, "x": 10}]' в список Python: [{"id": 2, "x": 10}]
+                coords_list = json.loads(point_data.img_coordinates)
+
+                # 2. Проверяем, что это список и он не пустой
+                if isinstance(coords_list, list) and len(coords_list) > 0:
+                    # 3. Берем первый элемент списка и получаем значение по ключу 'id'
+                    extracted_point_id = coords_list[0].get('id')
+
+            except (json.JSONDecodeError, TypeError) as e:
+                print(f"Ошибка парсинга координат для детали {part_id}: {e}")
+
+        modal_content = html.Div(
+            [
+                html.Div(
+                    [
+                        html.H3(
+                            f"Деталь {extracted_point_id}",
+                            style={
+                                'marginBottom': '20px',
+                                'color': '#2d3748',
+                                'fontSize': '24px',
+                                'fontWeight': '600'
+                            }
+                        ),
+
+                        # Блок с описанием
+                        html.Div(
+                            [
+                                html.H5(
+                                    "Название:",
+                                    style={
+                                        'color': '#4a5568',
+                                        'marginBottom': '10px',
+                                        'fontSize': '16px',
+                                        'fontWeight': '600'
+                                    }
+                                ),
+                                html.P(
+                                    # point_data.get('description', 'Нет данных'),
+                                    # 'Нет данных',
+                                    point_data.name if point_data else 'Нет данных',
+                                    style={
+                                        'color': '#718096',
+                                        'fontSize': '15px',
+                                        'lineHeight': '1.6',
+                                        'padding': '15px',
+                                        'backgroundColor': '#f7fafc',
+                                        'borderRadius': '8px',
+                                        'borderLeft': '4px solid #4299e1'
+                                    }
+                                )
+                            ], style={'marginBottom': '25px'}
+                        ),
+
+                        # Блок с OEM номером
+                        html.Div(
+                            [
+                                html.H5(
+                                    "OEM номер:",
+                                    style={
+                                        'color': '#4a5568',
+                                        'marginBottom': '10px',
+                                        'fontSize': '16px',
+                                        'fontWeight': '600'
+                                    }
+                                ),
+                                html.P(
+                                    dcc.Link(
+                                        point_data.oem_num if point_data else 'Нет данных',
+                                        href=f"/original_catalogs/analogs/{point_data.id}"
+                                    ),
+                                    style={
+                                        'color': '#2d3748',
+                                        'fontSize': '18px',
+                                        'fontWeight': '500',
+                                        'fontFamily': 'monospace',
+                                        'padding': '15px',
+                                        'backgroundColor': '#edf2f7',
+                                        'borderRadius': '8px',
+                                        'textAlign': 'center'
+                                    }
+                                )
+                            ], style={'marginBottom': '25px'}
+                        ),
+
+                    ]
+                )
+            ]
+        )
+
+        return True, modal_content
+
+    return no_update, no_update
+
+# Вспомогательная функция для получения данных о точке
+def get_point_data(point_id):
+    """Замените на реальный запрос к БД"""
+
+    return {
+        "description": f"Тестовое описание для точки {point_id}",
+        "oem_num": f"OEM-{point_id:05d}",
+    }
 
 @callback(
     Output('parts-table', 'children'),
@@ -279,8 +469,6 @@ def show_parts(selected_cat_id):
             'gap': '20px',
             'padding': '32px 24px',
             'marginTop': '20px',
-
-            # 👇 Новый стиль карточки вместо старой рамки
             'border': '1px solid #e2e8f0',
             'borderRadius': '12px',
             'backgroundColor': '#ffffff',
