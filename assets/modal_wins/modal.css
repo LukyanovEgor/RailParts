@@ -1,0 +1,51 @@
+/* Принудительное центрирование модального окна */
+.modal {
+    z-index: 9999 !important;
+}
+
+.modal-backdrop {
+    z-index: 9998 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Центрирование диалога */
+.modal-dialog {
+    margin: 1.75rem auto !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: calc(100% - 3.5rem) !important;
+}
+
+/* Центрирование для centered=True */
+.modal-dialog-centered {
+    display: flex !important;
+    align-items: center !important;
+    min-height: calc(100% - 1rem) !important;
+}
+
+/* Стили для контента */
+.modal-content {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+}
+
+.modal-header {
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding: 20px 30px !important;
+}
+
+.modal-body {
+    padding: 30px !important;
+}
+
+.modal-footer {
+    border-top: 2px solid #e2e8f0 !important;
+    padding: 20px 30px !important;
+}
+
+/* Блокировка прокрутки body когда открыта модалка */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}

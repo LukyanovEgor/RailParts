@@ -8,7 +8,7 @@ class Orders(Base):
 
     id = Column(INTEGER(), primary_key=True, autoincrement=True)
     user_id = Column(INTEGER(), ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
-    status = Column(VARCHAR(20), default='сформирован', nullable=False)
+    status = Column(VARCHAR(20), default='Сформирован', nullable=False)
     created_at = Column(TIMESTAMP(), server_default=func.now(), nullable=False)
     updated_at = Column(TIMESTAMP(), server_default=func.now(), onupdate=func.now(), nullable=True)
 

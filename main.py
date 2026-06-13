@@ -1,7 +1,8 @@
 from app import pages_registration
 from app.pages_registration import page_registration
 from flask import Flask, send_from_directory, request, redirect
-from app.routes import auth_bp, orders_bp
+from app.routes import auth_bp
+import dash_bootstrap_components as dbc
 import dash
 import os
 
@@ -18,7 +19,8 @@ app = dash.Dash(__name__,
                 use_pages=True,
                 server=server,
                 pages_folder='app/pages',
-                suppress_callback_exceptions=True)
+                suppress_callback_exceptions=True,
+                external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 
 page_registration()
