@@ -28,13 +28,13 @@ class ByNumSearcher:
                 ], className="card search-card"),
 
                 # Разделитель (опционально)
-                html.Div(className="divider"),
+                # html.Div(className="divider"),
 
                 # Правая карточка: Поиск по названию
-                html.Div([
-                    html.H2('Поиск по названию состава', className="card-title"),
-                    # Сюда можно добавить input для поиска по названию
-                ], className="card name-card")
+                # html.Div([
+                #     html.H2('Поиск по названию состава', className="card-title"),
+                #     # Сюда можно добавить input для поиска по названию
+                # ], className="card name-card")
             ], className="searcher-container")
         ])
 

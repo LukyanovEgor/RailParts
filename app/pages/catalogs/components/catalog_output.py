@@ -18,7 +18,7 @@ class CatalogOutput:
                     'min-height': '80px'
                 }
             ),
-        ])
+        ], className="searcher-container")
 
     def __call__(self, *args, **kwargs):
         return self.catalog

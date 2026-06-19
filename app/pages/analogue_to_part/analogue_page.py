@@ -6,6 +6,7 @@ import json
 import jwt
 from flask import request
 from app.order_services.make_order import make_order
+import dash_bootstrap_components as dbc
 
 
 def analogue_parts_layout(oem_part_id=None):
@@ -113,6 +114,37 @@ def analogue_parts_layout(oem_part_id=None):
                     ),
 
                     html.Div(id='order-notification-analogue', style={'marginBottom': '15px'}),
+
+                    dbc.Modal(
+                        [
+                            dbc.ModalBody(
+                                id="modal-content2",
+                                style={
+                                    'minHeight': '300px',
+                                    'padding': '30px'
+                                }
+                            ),
+                            dbc.ModalFooter(
+                                dbc.Button(
+                                    "Закрыть",
+                                    id="close-modal-btn2",
+                                    className="ms-auto",
+                                    color="secondary"
+                                )
+                            )
+                        ],
+                        id="point-modal2",
+                        is_open=False,
+                        size="sm",
+                        centered=True,
+                        fade=True,
+                        scrollable=True,
+                        style={
+                            'zIndex': '9999',  # Самый верхний слой
+                        },
+                        backdrop=True
+
+                    )
                 ]
             ),
         ], style={'padding': '20px', 'maxWidth': '1200px', 'margin': '0 auto'}
@@ -209,63 +241,180 @@ def create_analogue_card(part):
         ], style={'marginBottom': '10px'}
     )
 
+#
+# @callback(
+#     Output('order-notification-analogue', 'children'),
+#     Input({'type': 'order-btn', 'part_id': ALL, 'part_type': ALL}, 'n_clicks'),
+#     prevent_initial_call=True
+# )
+# def handle_analogue_order(n_clicks_list):
+#     if not any(n_clicks_list):
+#         return no_update
+#
+#     triggered = ctx.triggered
+#     if not triggered:
+#         return no_update
+#
+#     # 1️⃣ Парсим ID нажатой кнопки
+#     prop_id = triggered[0]['prop_id']
+#     id_data = json.loads(prop_id.split('.n_clicks')[0])
+#     part_id = id_data['part_id']
+#     part_type = id_data['part_type']
+#
+#     # 2️⃣ Проверка авторизации (как в прошлом примере)
+#     token = request.cookies.get('auth_token')
+#     if not token:
+#         return html.Div(
+#             "🔐 Войдите в аккаунт, чтобы оформить заказ",
+#             style={'color': '#dc3545', 'padding': '10px', 'backgroundColor': '#fff3cd', 'borderRadius': '4px'}
+#             )
+#
+#     try:
+#         # Замените на ваш реальный SECRET_KEY
+#         payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+#         user_id = payload.get("user_id")
+#         if not user_id:
+#             return html.Div("️ Сессия невалидна", style={'color': '#dc3545', 'padding': '10px'})
+#     except jwt.ExpiredSignatureError:
+#         return html.Div("⏳ Срок действия сессии истёк", style={'color': '#dc3545', 'padding': '10px'})
+#     except jwt.InvalidTokenError:
+#         return html.Div("🔒 Ошибка токена", style={'color': '#dc3545', 'padding': '10px'})
+#
+#     # 3️⃣ Вызов вашей функции make_order
+#     try:
+#
+#         make_order(
+#             db=get_db(),
+#             user_id=user_id,
+#             part_id=part_id,
+#             is_oem=part_type == 'oem'
+#         )
+#
+#         db = get_db()
+#         if part_type == 'oem':
+#             part_name = db.query(OEMParts).filter(OEMParts.id == part_id).first().name
+#         else:
+#             part_name = db.query(AnalogueParts).filter(AnalogueParts.id == part_id).first().name
+#
+#         return html.Div(
+#             f"✅ {part_name} #{part_id} успешно добавлен в заказ!",
+#             style={'color': '#155724', 'padding': '10px', 'backgroundColor': '#d4edda', 'borderRadius': '4px',
+#                    'fontWeight': '500'}
+#             )
+#     except Exception as e:
+#         return html.Div(
+#             f"❌ Ошибка при оформлении: {str(e)}",
+#             style={'color': '#721c24', 'padding': '10px', 'backgroundColor': '#f8d7da', 'borderRadius': '4px'}
+#             )
+
 
 @callback(
-    Output('order-notification-analogue', 'children'),
-    Input({'type': 'order-btn', 'part_id': ALL, 'part_type': ALL}, 'n_clicks'),
+    Output("point-modal2", "is_open"),
+    Output("modal-content2", "children"),
+    Input({"type": "order-btn", "part_id": ALL, "part_type": ALL}, "n_clicks"),
+    Input("close-modal-btn2", "n_clicks"),
+    State("point-modal2", "is_open"),
     prevent_initial_call=True
 )
-def handle_analogue_order(n_clicks_list):
-    if not any(n_clicks_list):
-        return no_update
+def handle_analogue_order(order_clicks, close_clicks, is_open):
+    triggered = ctx.triggered_id
 
-    triggered = ctx.triggered
-    if not triggered:
-        return no_update
+    # Закрытие модалки
+    if triggered == "close-modal-btn2":
+        return False, no_update
 
-    # 1️⃣ Парсим ID нажатой кнопки
-    prop_id = triggered[0]['prop_id']
-    id_data = json.loads(prop_id.split('.n_clicks')[0])
-    part_id = id_data['part_id']
-    part_type = id_data['part_type']
+    # Обработка клика на кнопку "Заказ"
+    if isinstance(triggered, dict) and triggered.get('type') == 'order-btn':
+        if not order_clicks or all(click is None or click == 0 for click in order_clicks):
+            return no_update, no_update
 
-    # 2️⃣ Проверка авторизации (как в прошлом примере)
-    token = request.cookies.get('auth_token')
-    if not token:
-        return html.Div(
-            "🔐 Войдите в аккаунт, чтобы оформить заказ",
-            style={'color': '#dc3545', 'padding': '10px', 'backgroundColor': '#fff3cd', 'borderRadius': '4px'}
+        part_id = triggered['part_id']
+        part_type = triggered['part_type']
+
+        # Проверка авторизации
+        token = request.cookies.get('auth_token')
+        if not token:
+            modal_content = html.Div([
+                html.H3("⚠️ Требуется авторизация", style={'color': '#dc3545', 'marginBottom': '20px', 'textAlign': 'center'}),
+                html.P("Необходимо войти в аккаунт для оформления заказа.", style={'fontSize': '16px', 'textAlign': 'center'}),
+                html.A(
+                    "Войти",
+                    href="/signin",
+                    style={
+                        'backgroundColor': '#8B0000',
+                        'color': 'white',
+                        'padding': '10px 20px',
+                        'textDecoration': 'none',
+                        'borderRadius': '6px',
+                        'display': 'block',
+                        'textAlign': 'center',
+                        'marginTop': '15px'
+                    }
+                )
+            ])
+            return True, modal_content
+
+        try:
+            payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+            user_id = payload.get("user_id")
+            if not user_id:
+                modal_content = html.Div([
+                    html.H3("⚠️ Сессия невалидна", style={'color': '#dc3545', 'marginBottom': '20px', 'textAlign': 'center'}),
+                    html.P("Пожалуйста, войдите в аккаунт снова.", style={'fontSize': '16px', 'textAlign': 'center'})
+                ])
+                return True, modal_content
+        except jwt.ExpiredSignatureError:
+            modal_content = html.Div([
+                html.H3("⏰ Сессия истекла", style={'color': '#dc3545', 'marginBottom': '20px', 'textAlign': 'center'}),
+                html.P("Срок действия сессии истёк. Пожалуйста, войдите снова.", style={'fontSize': '16px', 'textAlign': 'center'})
+            ])
+            return True, modal_content
+        except jwt.InvalidTokenError:
+            modal_content = html.Div([
+                html.H3(" Ошибка токена", style={'color': '#dc3545', 'marginBottom': '20px', 'textAlign': 'center'}),
+                html.P("Не удалось проверить токен авторизации.", style={'fontSize': '16px', 'textAlign': 'center'})
+            ])
+            return True, modal_content
+
+        # Создание заказа
+        db = get_db()
+        try:
+            make_order(
+                db=db,
+                user_id=user_id,
+                part_id=part_id,
+                is_oem=(part_type == 'oem')
             )
 
-    try:
-        # Замените на ваш реальный SECRET_KEY
-        payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
-        user_id = payload.get("user_id")
-        if not user_id:
-            return html.Div("️ Сессия невалидна", style={'color': '#dc3545', 'padding': '10px'})
-    except jwt.ExpiredSignatureError:
-        return html.Div("⏳ Срок действия сессии истёк", style={'color': '#dc3545', 'padding': '10px'})
-    except jwt.InvalidTokenError:
-        return html.Div("🔒 Ошибка токена", style={'color': '#dc3545', 'padding': '10px'})
+            db.commit()
 
-    # 3️⃣ Вызов вашей функции make_order
-    try:
+            # Получаем название детали
+            Model = OEMParts if part_type == 'oem' else AnalogueParts
+            part = db.query(Model).filter_by(id=part_id).first()
+            part_name = part.name if part else "Неизвестная деталь"
 
-        make_order(
-            db=get_db(),
-            user_id=user_id,
-            part_id=part_id,
-            is_oem=part_type == 'oem'
-        )
+            modal_content = html.Div([
+                html.H3("✅ Добавлено!", style={'color': '#28a745', 'marginBottom': '20px', 'textAlign': 'center'}),
+                html.P("Деталь", style={'fontSize': '16px', 'textAlign': 'center'}),
+                html.P(
+                    part_name,
+                    style={'fontSize': '18px', 'fontWeight': 'bold', 'textAlign': 'center', 'marginBottom': '10px'}
+                ),
+                html.P(
+                    f"успешно добавлена в заказ!",
+                    style={'fontSize': '16px', 'textAlign': 'center'}
+                )
+            ])
+            return True, modal_content
 
-        part_name = "Оригинал" if part_type == "oem" else "Аналог"
-        return html.Div(
-            f"✅ {part_name} #{part_id} успешно добавлен в заказ!",
-            style={'color': '#155724', 'padding': '10px', 'backgroundColor': '#d4edda', 'borderRadius': '4px',
-                   'fontWeight': '500'}
-            )
-    except Exception as e:
-        return html.Div(
-            f"❌ Ошибка при оформлении: {str(e)}",
-            style={'color': '#721c24', 'padding': '10px', 'backgroundColor': '#f8d7da', 'borderRadius': '4px'}
-            )
+        except Exception as e:
+            db.rollback()
+            modal_content = html.Div([
+                html.H3("❌ Ошибка оформления", style={'color': '#dc3545', 'marginBottom': '20px', 'textAlign': 'center'}),
+                html.P(f"Не удалось добавить деталь в заказ: {str(e)}", style={'fontSize': '16px', 'textAlign': 'center'})
+            ])
+            return True, modal_content
+        finally:
+            db.close()
+
+    return no_update, no_update
