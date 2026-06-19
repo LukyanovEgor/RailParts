@@ -29,13 +29,11 @@ def search_train_db(session: Session, unique_id: str) -> Optional[Dict[str, Any]
     if not train:
         return None
 
-    train_type_data = None
-
     if train.train_type:
         train_type_data = {
             "id": train.train_type.id,
-            "name": train.train_type.name,  # Замените 'name' на реальное поле
-            "description": getattr(train.train_type, 'description', None)  # Пример опционального поля
+            "name": train.train_type.name,
+            "description": getattr(train.train_type, 'description', None)
         }
     else:
         train_type_data = {"error": "Тип поезда не найден (возможно, удален)"}

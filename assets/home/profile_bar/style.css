@@ -56,3 +56,9 @@
 .btn_style_profile:hover {
     background-color: #0056b3;
 }
+
+
+.auth-button-1 {
+    padding: 40px
+    align: right
+}

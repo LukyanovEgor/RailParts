@@ -9,8 +9,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
 import os
 
-# 📌 РЕГИСТРАЦИЯ КИРИЛЛИЧЕСКОГО ШРИФТА (Обязательно для корректного отображения)
-# Положи файл шрифта (например, arial.ttf) в папку assets/fonts/
+# РЕГИСТРАЦИЯ КИРИЛЛИЧЕСКОГО ШРИФТА (Обязательно для корректного отображения)
+
 FONT_PATH = os.path.join(os.path.dirname(__file__), "../../../../assets/fonts/arial.ttf")
 if os.path.exists(FONT_PATH):
     pdfmetrics.registerFont(TTFont('Cyrillic', FONT_PATH))
@@ -118,7 +118,7 @@ def generate_order_pdf(order, db):
                 )
             )
 
-    # 4. Футер (без сумм, как просил)
+    # 4. Футер
     story.append(Spacer(5 * mm, 5 * mm))
     footer_style = ParagraphStyle('Footer', fontName=FONT_NAME, fontSize=9, alignment=TA_LEFT, textColor=colors.grey)
     story.append(Paragraph("Документ сформирован автоматически в системе РельсыШпалы.", footer_style))

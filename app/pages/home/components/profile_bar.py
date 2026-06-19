@@ -18,9 +18,6 @@ class ProfileBar:
 
             self.links = [
                 dcc.Link('Профиль', href=f"/profile/{user_id}", className="profile-link"),
-                html.A('Мои заказы', href="/orders/redirect/my_orders/", className="profile-link"),
-                dcc.Link('Депо', href="/signup", className="profile-link"),
-                dcc.Link('Избранные', href="/signup", className="profile-link"),
             ]
 
             if user and user.is_admin:

@@ -22,7 +22,8 @@ class UserBut:
                         'backgroundColor': '#cccccc',  # серый прямоугольный фон
                         'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center',
                         'marginRight': '8px',
-                        'borderRadius': '4px'
+                        'borderRadius': '4px',
+                        'align': 'right',
                     }
                 ),
                 html.Span(username, style={'fontWeight': '500', 'fontSize': '15px'})
